@@ -1,10 +1,24 @@
 import express from "express";
-import {login, logout, signup, updateProfile} from "../controllers/auth.controller";
-import {protectedRoute} from "../middleware/auth.middleware";
+import {
+  checkAuth,
+  login,
+  logout,
+  signup,
+  updateProfile,
+} from "../controllers/auth.controller";
+import { protectedRoute } from "../middleware/auth.middleware";
+import { uploadMiddleware } from "../middleware/multer";
 
-export const router = express.Router();
+export const authRoutes = express.Router();
 
-router.post("/signup", signup)
-router.post("/login", login)
-router.post("/logout", logout)
-router.put("/update-profile", protectedRoute, updateProfile)
+authRoutes.post("/signup", signup);
+authRoutes.post("/login", login);
+authRoutes.post("/logout", logout);
+authRoutes.put(
+  "/update-profile",
+  protectedRoute,
+  uploadMiddleware,
+  updateProfile
+);
+
+authRoutes.get("/check", protectedRoute, checkAuth);
