@@ -18,7 +18,8 @@
     "express": "^4.21.2",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.9.5",
-    "socket.io": "^4.8.1"
+    "socket.io": "^4.8.1",
+    "uploadthing": "^7.4.4"
   },
   "devDependencies": {
     "@types/express": "^5.0.0",
