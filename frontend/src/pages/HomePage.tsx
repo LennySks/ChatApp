@@ -1,5 +1,8 @@
-import { Sidebar } from "lucide-react";
 import { useChatStore } from "../store/useChatStore";
+import {NoChatSelected} from "../components/NoChatSelected.tsx";
+import {ChatContainer} from "../components/ChatContainer.tsx"
+import {Sidebar} from "../components/Sidebar.tsx"
+import {SidebarSkeleton} from "../components/skeletons/SidebarSkeleton.tsx";
 
 export const HomePage = () => {
   const { selectedUser } = useChatStore();

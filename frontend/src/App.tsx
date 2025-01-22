@@ -10,14 +10,15 @@ import { useEffect } from "react";
 import { Loader } from "lucide-react";
 import { useThemeStore } from "./store/useThemeStore";
 import { Toaster } from "react-hot-toast";
+
 const App = () => {
-  const { authUser, checkAuth, isCheckingAuth } = useAuthStore();
+  const { authUser, checkAuth, isCheckingAuth, onlineUsers } = useAuthStore();
   const { theme } = useThemeStore();
   useEffect(() => {
     checkAuth();
   }, [checkAuth]);
 
-  console.log(authUser);
+  console.log("Online Users: ", onlineUsers);
 
   if (isCheckingAuth && !authUser)
     return (
@@ -36,7 +37,7 @@ const App = () => {
         />
         <Route
           path="/signup"
-          element={!authUser ? <SignUpPage /> : <Navigate to="/login" />}
+          element={!authUser ? <SignUpPage /> : <Navigate to="/" />}
         />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/settings" element={<SettingsPage />} />
