@@ -3,10 +3,11 @@ import { protectedRoute } from "../middleware/auth.middleware";
 import {
   getMessages,
   getUsersForSidebar,
+  sendMessage,
 } from "../controllers/message.controller";
 
 export const messagesRoute = express.Router();
 
 messagesRoute.get("/users", protectedRoute, getUsersForSidebar);
 messagesRoute.get("/:id", protectedRoute, getMessages);
-messagesRoute.post("/send/:id", protectedRoute, getMessages);
+messagesRoute.post("/send/:id", protectedRoute, sendMessage);
