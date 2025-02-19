@@ -1,54 +1,40 @@
-import { Navigate, Route, Routes } from "react-router-dom";
-import Navbar from "./components/Navbar";
-import { HomePage } from "./pages/HomePage";
-import { LoginPage } from "./pages/LoginPage";
-import { ProfilePage } from "./pages/ProfilePage";
-import { SettingsPage } from "./pages/SettingsPage";
-import { SignUpPage } from "./pages/SignUpPage";
-import { useAuthStore } from "./store/useAuthStore";
-import { useEffect } from "react";
-import { Loader } from "lucide-react";
-import { useThemeStore } from "./store/useThemeStore";
-import { Toaster } from "react-hot-toast";
-const App = () => {
-  const { authUser, checkAuth, isCheckingAuth } = useAuthStore();
-  const { theme } = useThemeStore();
-  useEffect(() => {
-    checkAuth();
-  }, [checkAuth]);
-
-  console.log(authUser);
-
-  if (isCheckingAuth && !authUser)
+function App() {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <Loader className="size-10 animate-spin" />
-      </div>
+        <>
+            <div className="flex flex-col min-h-screen items-center justify-center p-4">
+                <div className="w-full max-w-[500px] border rounded-lg shadow-md flex flex-col bg-white">
+                    <h1 className="text-2xl font-bold text-center p-4">Anonymous Chat</h1>
+
+                    {/* Chat Box - Scrollable */}
+                    <div className="flex flex-col flex-grow overflow-y-auto p-4 h-[400px] border-b">
+                        <div className="chat chat-start">
+                            <div className="chat-bubble">
+                                It's over Anakin,
+                                <br/>
+                                I have the high ground.
+                            </div>
+                        </div>
+                        <div className="chat chat-end">
+                            <div className="chat-bubble">You underestimate my power!</div>
+                        </div>
+                        {/* Add more messages here to test scrolling */}
+                    </div>
+
+                    {/* Input Bar - Stays at the bottom */}
+                    <div className="flex items-center gap-2 p-4">
+                        <input type="text" placeholder="Type here" className="input flex-grow"/>
+                        <button className="btn btn-soft btn-primary">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
+                                 className="size-5">
+                                <path
+                                    d="M3.105 2.288a.75.75 0 0 0-.826.95l1.414 4.926A1.5 1.5 0 0 0 5.135 9.25h6.115a.75.75 0 0 1 0 1.5H5.135a1.5 1.5 0 0 0-1.442 1.086l-1.414 4.926a.75.75 0 0 0 .826.95 28.897 28.897 0 0 0 15.293-7.155.75.75 0 0 0 0-1.114A28.897 28.897 0 0 0 3.105 2.288Z"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </>
     );
-
-  return (
-    <div data-theme={theme}>
-      <Navbar />
-      <Routes>
-        <Route
-          path="/"
-          element={authUser ? <HomePage /> : <Navigate to="/login" />}
-        />
-        <Route
-          path="/signup"
-          element={!authUser ? <SignUpPage /> : <Navigate to="/login" />}
-        />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/settings" element={<SettingsPage />} />
-        <Route
-          path="/profile"
-          element={authUser ? <ProfilePage /> : <Navigate to="/login" />}
-        />
-      </Routes>
-
-      <Toaster />
-    </div>
-  );
-};
+}
 
 export default App;
