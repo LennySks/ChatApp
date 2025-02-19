@@ -1,29 +1,40 @@
+import {MyUserMessage} from "./components/MyUserMessage.tsx";
+import {UserMessage} from "./components/UserMessage.tsx";
+import {useState} from "react";
+import { io } from "socket.io-client";
+
 function App() {
+    const [message, setMessage] = useState("")
+    const [messages, setMessages] = useState([])
+    const socket = io("http://localhost:3001")
+
+    socket.on("connect", () => {
+        console.log(socket.id);
+    });
+
+
+    function sendMessage(){
+        console.log("Sending message", message);
+    }
+
+    function handleInputChange(event){
+        setMessage(event.target.value)
+    }
+
     return (
         <>
             <div className="flex flex-col min-h-screen items-center justify-center p-4">
                 <div className="w-full max-w-[500px] border rounded-lg shadow-md flex flex-col bg-white">
                     <h1 className="text-2xl font-bold text-center p-4">Anonymous Chat</h1>
 
-                    {/* Chat Box - Scrollable */}
                     <div className="flex flex-col flex-grow overflow-y-auto p-4 h-[400px] border-b">
-                        <div className="chat chat-start">
-                            <div className="chat-bubble">
-                                It's over Anakin,
-                                <br/>
-                                I have the high ground.
-                            </div>
-                        </div>
-                        <div className="chat chat-end">
-                            <div className="chat-bubble">You underestimate my power!</div>
-                        </div>
-                        {/* Add more messages here to test scrolling */}
+                        <MyUserMessage message="Hello there!"/>
+                        <UserMessage message="Hi!"/>
                     </div>
 
-                    {/* Input Bar - Stays at the bottom */}
                     <div className="flex items-center gap-2 p-4">
-                        <input type="text" placeholder="Type here" className="input flex-grow"/>
-                        <button className="btn btn-soft btn-primary">
+                        <input value={message} onChange={handleInputChange} type="text" placeholder="Type here" className="input flex-grow"/>
+                        <button onClick={sendMessage} className="btn btn-soft btn-primary">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
                                  className="size-5">
                                 <path
@@ -31,6 +42,10 @@ function App() {
                             </svg>
                         </button>
                     </div>
+
+                </div>
+                <div>
+                    5 users connected
                 </div>
             </div>
         </>
