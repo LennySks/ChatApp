@@ -1,6 +1,6 @@
 import {MyUserMessage} from "./components/MyUserMessage.tsx";
 import {UserMessage} from "./components/UserMessage.tsx";
-import {useEffect, useState} from "react";
+import {ChangeEvent, useEffect, useState} from "react";
 import {io} from "socket.io-client";
 
 const socket = io("http://localhost:3001")
@@ -10,24 +10,38 @@ interface UserMessage {
     message: string;
 }
 
+
 function App() {
     const [message, setMessage] = useState("")
     const [messages, setMessages] = useState([])
-
+    const [connectedUsers, setConnectedUsers] = useState(0)
 
     useEffect(() => {
         socket.on("connect", () => {
             console.log("Connected with ID:", socket.id);
         });
 
+        socket.on("initialMessages", (initialMessages: UserMessage[]) => {
+            setMessages(initialMessages);
+        });
+
+        socket.on('connectedUserCount', (count: number) => {
+            setConnectedUsers(count)
+        })
+
+        socket.on("newMessage", (msg: UserMessage) => {
+            setMessages((prevMessages) => [...prevMessages, msg]);
+        });
+
         return () => {
             socket.off("connect");
+            socket.off("initialMessages");
+            socket.off("newMessage");
         };
     }, []);
 
 
     function sendMessage() {
-        console.log("Sending message", message);
         if (message.trim().length === 0) {
             return;
         }
@@ -42,9 +56,10 @@ function App() {
         socket.emit("newMessage", {
             userMessage
         })
+        setMessage("")
     }
 
-    function handleInputChange(event) {
+    function handleInputChange(event: ChangeEvent<HTMLInputElement>) {
         setMessage(event.target.value)
     }
 
@@ -55,8 +70,13 @@ function App() {
                     <h1 className="text-2xl font-bold text-center p-4">Anonymous Chat</h1>
 
                     <div className="flex flex-col flex-grow overflow-y-auto p-4 h-[400px] border-b">
-                        <MyUserMessage message="Hello there!"/>
-                        <UserMessage message="Hi!"/>
+                        {messages.map((msg: UserMessage, index) => (
+                            msg.sessionId === socket.id ? (
+                                <MyUserMessage key={index} message={msg.message}/>
+                            ) : (
+                                <UserMessage key={index} message={msg.message}/>
+                            )
+                        ))}
                     </div>
 
                     <div className="flex items-center gap-2 p-4">
@@ -73,7 +93,7 @@ function App() {
 
                 </div>
                 <div>
-                    5 users connected
+                    {connectedUsers} users connected
                 </div>
             </div>
         </>
