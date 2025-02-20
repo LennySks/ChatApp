@@ -1,23 +1,50 @@
 import {MyUserMessage} from "./components/MyUserMessage.tsx";
 import {UserMessage} from "./components/UserMessage.tsx";
-import {useState} from "react";
-import { io } from "socket.io-client";
+import {useEffect, useState} from "react";
+import {io} from "socket.io-client";
+
+const socket = io("http://localhost:3001")
+
+interface UserMessage {
+    sessionId: string;
+    message: string;
+}
 
 function App() {
     const [message, setMessage] = useState("")
     const [messages, setMessages] = useState([])
-    const socket = io("http://localhost:3001")
-
-    socket.on("connect", () => {
-        console.log(socket.id);
-    });
 
 
-    function sendMessage(){
+    useEffect(() => {
+        socket.on("connect", () => {
+            console.log("Connected with ID:", socket.id);
+        });
+
+        return () => {
+            socket.off("connect");
+        };
+    }, []);
+
+
+    function sendMessage() {
         console.log("Sending message", message);
+        if (message.trim().length === 0) {
+            return;
+        }
+        if (socket.id === undefined) {
+            console.error("Socket ID is undefined");
+            return;
+        }
+        const userMessage: UserMessage = {
+            sessionId: socket.id,
+            message: message
+        }
+        socket.emit("newMessage", {
+            userMessage
+        })
     }
 
-    function handleInputChange(event){
+    function handleInputChange(event) {
         setMessage(event.target.value)
     }
 
@@ -33,7 +60,8 @@ function App() {
                     </div>
 
                     <div className="flex items-center gap-2 p-4">
-                        <input value={message} onChange={handleInputChange} type="text" placeholder="Type here" className="input flex-grow"/>
+                        <input value={message} onChange={handleInputChange} type="text" placeholder="Type here"
+                               className="input flex-grow"/>
                         <button onClick={sendMessage} className="btn btn-soft btn-primary">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
                                  className="size-5">

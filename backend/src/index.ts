@@ -8,7 +8,15 @@ const port = process.env.PORT || 3001;
 
 const io = new Server(httpServer, {});
 
-let messages: [] = [];
+interface UserMessage {
+    sessionId: string;
+    message: string;
+    timeStamp: Date;
+}
+
+type IncomingUserMessage = Omit<UserMessage, 'timeStamp'>
+
+let messages: UserMessage[] = [];
 
 app.use(express.json());
 
@@ -19,14 +27,20 @@ app.get('/', (req: Request, res: Response) => {
 io.on('connection', (socket) => {
     console.log(`User with id ${socket.id} has connected`);
 
-    socket.on('newMessage', (msg) => {
+    socket.on('newMessage', (data: { userMessage: IncomingUserMessage }) => {
+        const msg = data.userMessage;
         console.log('new message', msg);
-        messages.push(msg);
+        messages.push({
+            sessionId: msg.sessionId,
+            message: msg.message,
+            timeStamp: new Date()
+        });
         io.emit('newMessage', msg);
+        console.log("Chat Logs: ", messages)
     })
 
     socket.on('disconnect', () => {
-        console.log('user disconnected');
+        console.log(`User with id ${socket.id} disconnected`);
     });
 })
 
